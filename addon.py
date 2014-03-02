@@ -10,89 +10,145 @@
 # import xbmcgui
 from xbmcswift2 import *
 from dvllive.web import Dvllive
-from pyxbmct.addonwindow import *
+# from pyxbmct.addonwindow import *
 
 
 addon = xbmcaddon.Addon('plugin.video.dvllive')
 __author__ = 'Torsten'
 
+plugin = Plugin()
+dvllive = Dvllive()
+
+@plugin.route('/')
+def index():
+    items = []
+    dvllive.get_videos()
+    # item = {
+    #     'label': 'Hello XBMC!',
+    #     'path': 'http://s3.amazonaws.com/KA-youtube-converted/JwO_25S_eWE.mp4/JwO_25S_eWE.mp4',
+    #     'is_playable': True,
+    #     'type': 'video'
+    # }
+    # return [item, item]
+    for video in dvllive.videos_found:
+        item = {
+            # 'label': video['label'],
+            'label': video['path'],
+            'path': plugin.url_for('show_video', stub=video['path'])
+            # 'path': video['path'],
+            # 'is_playable': video['is_playable']
+        }
+        items.append(item)
+    return items
+    # print dvllive.videos_found
+    # return dvllive.videos_found
+
+@plugin.route('/showvideo/<stub>/')
+def show_video(stub):
+    video = dvllive.play_video(stub)
+    item = {
+        'label': 'asdf',
+        'path': plugin.url_for('play_video', url=video['path'])
+    }
+    print item
+    items = [item]
+    return items
+    # return plugin.finish(items)
+
+@plugin.route('/playvideo/<url>/')
+def play_video(url):
+    print 'Playing url: %s' % url
+    # url = 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % lecture.youtube_id
+    plugin.log.info('Playing url: %s' % url)
+    # plugin.set_resolved_url(url)
+    items = [{
+        'label': 'asdf',
+        'path': url,
+        'is_playable': True,
+    }]
+    return plugin.finish(items)
+
+    # return plugin.finish(url)
 
 
-class MyDisplay(AddonFullWindow):
-    hello_button = None
-    close_button = None
-    name_field = None
-    title_list = None
-    videos = []
+# class MyDisplay(AddonFullWindow):
+#     hello_button = None
+#     close_button = None
+#     name_field = None
+#     title_list = None
+#     videos = []
+#
+#     def __init__(self, title=''):
+#         # Call the base class' constructor.
+#         super(MyDisplay, self).__init__(title)
+#
+#         self._dvllive = Dvllive()
+#         self.videos_refresh()
+#
+#         # Set width, height, row, columns
+#         self.setGeometry(900, 630, 10, 5)
+#         # Call set controls method
+#         self.set_controls()
+#         # Call set navigation method.
+#         self.set_navigation()
+#         # Connect Backspace button to close our addon.
+#         self.connect(ACTION_NAV_BACK, self.close)
+#
+#     def videos_refresh(self):
+#         self._dvllive.get_videos()
+#         self.videos = self._dvllive.videos_found
+#
+#     def set_controls(self):
+#          """Set up UI controls"""
+#          # Image control
+#          image = Image('xbmc-logo.png')
+#          self.placeControl(image, 0, 0, rowspan=2, columnspan=5)
+#          # List
+#          self.title_list = List()
+#          self.placeControl(self.title_list, 2, 0, rowspan=7, columnspan=5)
+#          # for i in range(1, 4):
+#          for video in self.videos:
+#             self.title_list.addItem(video['title'])
+#          # Text label
+#          # label = Label('Your name:')
+#          # self.placeControl(label, 3, 0)
+#          # Text edit control
+#          # self.name_field = Edit('')
+#          # self.placeControl(self.name_field, 3, 1)
+#          # Close button
+#          self.close_button = Button('Close')
+#          self.placeControl(self.close_button, 9, 0)
+#          # Connect close button
+#          self.connect(self.close_button, self.close)
+#          # Hello button.
+#          self.hello_button = Button('Hello')
+#          self.placeControl(self.hello_button, 9, 1)
+#          # Connect Hello button.
+#          # self.connect(self.hello_button, lambda: xbmc.executebuiltin('Notification(Hello %s!, Welcome to PyXBMCt.)' % self.videos[1]['title']))
+#          # xbmc.executebuiltin('Notification(Hello %s!, Welcome to PyXBMCt.)' % self.name_field.getText()))
+#
+#     def set_navigation(self):
+#          """Set up keyboard/remote navigation between controls."""
+#          self.title_list.controlLeft(self.hello_button)
+#          # self.name_field.controlUp(self.hello_button)
+#          # self.name_field.controlDown(self.hello_button)
+#          self.close_button.controlLeft(self.hello_button)
+#          self.close_button.controlRight(self.hello_button)
+#          self.close_button.controlUp(self.title_list)
+#          self.close_button.controlDown(self.title_list)
+#          self.hello_button.controlLeft(self.close_button)
+#          self.hello_button.controlRight(self.close_button)
+#          self.hello_button.controlUp(self.title_list)
+#          self.hello_button.controlDown(self.title_list)
+#          # self.hello_button.setNavigation(self.name_field, self.name_field, self.close_button, self.close_button)
+#          # Set initial focus.
+#          self.setFocus(self.title_list)
 
-    def __init__(self, title=''):
-        # Call the base class' constructor.
-        super(MyDisplay, self).__init__(title)
 
-        self._dvllive = Dvllive()
-        self.videos_refresh()
+if __name__ == '__main__':
+    plugin.run()
 
-        # Set width, height, row, columns
-        self.setGeometry(900, 630, 10, 5)
-        # Call set controls method
-        self.set_controls()
-        # Call set navigation method.
-        self.set_navigation()
-        # Connect Backspace button to close our addon.
-        self.connect(ACTION_NAV_BACK, self.close)
-
-    def videos_refresh(self):
-        self._dvllive.get_videos()
-        self.videos = self._dvllive.videos_found
-
-    def set_controls(self):
-         """Set up UI controls"""
-         # Image control
-         image = Image('xbmc-logo.png')
-         self.placeControl(image, 0, 0, rowspan=2, columnspan=5)
-         # List
-         self.title_list = List()
-         self.placeControl(self.title_list, 2, 0, rowspan=7, columnspan=5)
-         # for i in range(1, 4):
-         for video in self.videos:
-            self.title_list.addItem(video['title'])
-         # Text label
-         # label = Label('Your name:')
-         # self.placeControl(label, 3, 0)
-         # Text edit control
-         # self.name_field = Edit('')
-         # self.placeControl(self.name_field, 3, 1)
-         # Close button
-         self.close_button = Button('Close')
-         self.placeControl(self.close_button, 9, 0)
-         # Connect close button
-         self.connect(self.close_button, self.close)
-         # Hello button.
-         self.hello_button = Button('Hello')
-         self.placeControl(self.hello_button, 9, 1)
-         # Connect Hello button.
-         # self.connect(self.hello_button, lambda: xbmc.executebuiltin('Notification(Hello %s!, Welcome to PyXBMCt.)' % self.videos[1]['title']))
-         # xbmc.executebuiltin('Notification(Hello %s!, Welcome to PyXBMCt.)' % self.name_field.getText()))
-
-    def set_navigation(self):
-         """Set up keyboard/remote navigation between controls."""
-         self.title_list.controlLeft(self.hello_button)
-         # self.name_field.controlUp(self.hello_button)
-         # self.name_field.controlDown(self.hello_button)
-         self.close_button.controlLeft(self.hello_button)
-         self.close_button.controlRight(self.hello_button)
-         self.close_button.controlUp(self.title_list)
-         self.close_button.controlDown(self.title_list)
-         self.hello_button.controlLeft(self.close_button)
-         self.hello_button.controlRight(self.close_button)
-         self.hello_button.controlUp(self.title_list)
-         self.hello_button.controlDown(self.title_list)
-         # self.hello_button.setNavigation(self.name_field, self.name_field, self.close_button, self.close_button)
-         # Set initial focus.
-         self.setFocus(self.title_list)
-
-
-mydisplay = MyDisplay()
-mydisplay.doModal()
-del mydisplay
+# mydisplay = MyDisplay()
+# mydisplay.doModal()
+# del mydisplay
 

@@ -32,13 +32,13 @@ class Dvllive(object):
 
     def play_video(self, partial_url):
         url = urlparse.urljoin(self._page_videos, partial_url)
-        print '\n\n\n\n\n\n'
-        print url
+        # print '\n\n\n\n\n\n'
+        # print url
         page_html = urllib2.urlopen(url)
         page_soup = BeautifulSoup(page_html.read())
         # print page_soup
         embed_url = page_soup.find('textarea', class_='code').iframe['src']
-        print embed_url
+        # print embed_url
         embed_html = urllib2.urlopen(embed_url)
         embed_soup = BeautifulSoup(embed_html.read())
         # print embed_soup
@@ -49,8 +49,22 @@ class Dvllive(object):
             # print embed_soup
             img = embed_soup.find('img')['data-src']
             print img
+            result = {
+                'label': 'asdf',
+                # 'type': 'image',
+                'path': img
+                # 'is_playable': True
+            }
         else:
             print asset
+            result = {
+                'label': 'asdf',
+                # 'type': 'video',
+                'path': asset.encode('utf-8')
+                # 'is_playable': True
+            }
+        finally:
+            return result
         # asset = embed_soup.find('a', class_='asset')
         # except NoneT
         # print page_soup.body.div.div.div.a['href']
@@ -72,11 +86,12 @@ class Dvllive(object):
                 continue
             else:
                 single_vid = {
-                    'link': link['href'],
-                    'thumb': link.find('img')['src'],
-                    'title': link['title'],
+                    'path': link['href'],
+                    # 'thumb': link.find('img')['src'],
+                    'label': link['title'],
                     # 'title': link['title'].encode('utf-8'),
-                    'date': link.find('span', class_='date').string.encode('utf-8')
+                    # 'date': link.find('span', class_='date').string.encode('utf-8'),
+                    'is_playable': True
                 }
                 vids_on_this_page.append(single_vid)
         return vids_on_this_page
