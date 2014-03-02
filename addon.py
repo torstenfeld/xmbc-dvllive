@@ -4,10 +4,11 @@
 # import urllib2
 # import re
 # import sys
-import xbmc
-import xbmcplugin
-import xbmcaddon
-import xbmcgui
+# import xbmc
+# import xbmcplugin
+# import xbmcaddon
+# import xbmcgui
+from xbmcswift2 import *
 from dvllive.web import Dvllive
 from pyxbmct.addonwindow import *
 
