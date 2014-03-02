@@ -43,6 +43,7 @@ class Dvllive(object):
             else:
                 single_vid = {
                     'link': link['href'],
+                    'thumb': link.find('img')['src'],
                     'title': link['title'].encode('utf-8'),
                     'date': link.find('span', class_='date').string.encode('utf-8')
                 }
