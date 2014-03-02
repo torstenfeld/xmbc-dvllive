@@ -3,10 +3,10 @@ __author__ = 'Torsten'
 
 from bs4 import BeautifulSoup
 import urllib2
-import pprint
+# import pprint
 import urlparse
 
-pp = pprint.PrettyPrinter(indent=4)
+# pp = pprint.PrettyPrinter(indent=4)
 
 
 class Dvllive(object):
@@ -26,10 +26,9 @@ class Dvllive(object):
             sub_page_html = urllib2.urlopen(self._page_videos + '?page=' + str(page_number))
             sub_page_soup = BeautifulSoup(sub_page_html.read())
             videos += self._get_video_per_page(sub_page_soup)
-            if str(page_number) >= '3':
+            if str(page_number) >= '2':
                 break
-            self.videos_found = videos
-        # pp.pprint(videos)
+        self.videos_found = videos
 
     def play_video(self, partial_url):
         url = urlparse.urljoin(self._page_videos, partial_url)
@@ -87,6 +86,7 @@ def main():
     dvllive.get_videos()
     # dvllive.play_video('embed/1f08c1507c3e013157697054d2ab7c84')
     for video in dvllive.videos_found:
+        # print video['link']
         dvllive.play_video(video['link'])
     # dvllive.play_video(dvllive.videos_found[0]['link'])
 
