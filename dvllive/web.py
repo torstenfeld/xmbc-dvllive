@@ -4,12 +4,14 @@ __author__ = 'Torsten'
 from bs4 import BeautifulSoup
 import urllib2
 import pprint
+import urlparse
 
 pp = pprint.PrettyPrinter(indent=4)
 
 
 class Dvllive(object):
     _page_videos = 'http://www.dvllive.tv/videos'
+    videos_found = []
 
     def __init__(self):
         pass
@@ -26,7 +28,34 @@ class Dvllive(object):
             videos += self._get_video_per_page(sub_page_soup)
             if str(page_number) >= '3':
                 break
-        pp.pprint(videos)
+            self.videos_found = videos
+        # pp.pprint(videos)
+
+    def play_video(self, partial_url):
+        url = urlparse.urljoin(self._page_videos, partial_url)
+        print '\n\n\n\n\n\n'
+        print url
+        page_html = urllib2.urlopen(url)
+        page_soup = BeautifulSoup(page_html.read())
+        # print page_soup
+        embed_url = page_soup.find('textarea', class_='code').iframe['src']
+        print embed_url
+        embed_html = urllib2.urlopen(embed_url)
+        embed_soup = BeautifulSoup(embed_html.read())
+        # print embed_soup
+        try:
+            asset = embed_soup.find('a', class_='asset')['href']
+        except KeyError:
+            print 'href not found'
+            # print embed_soup
+            img = embed_soup.find('img')['data-src']
+            print img
+        else:
+            print asset
+        # asset = embed_soup.find('a', class_='asset')
+        # except NoneT
+        # print page_soup.body.div.div.div.a['href']
+
 
     @staticmethod
     def _get_last_video_page(soup):
@@ -46,7 +75,8 @@ class Dvllive(object):
                 single_vid = {
                     'link': link['href'],
                     'thumb': link.find('img')['src'],
-                    'title': link['title'].encode('utf-8'),
+                    'title': link['title'],
+                    # 'title': link['title'].encode('utf-8'),
                     'date': link.find('span', class_='date').string.encode('utf-8')
                 }
                 vids_on_this_page.append(single_vid)
@@ -55,6 +85,10 @@ class Dvllive(object):
 def main():
     dvllive = Dvllive()
     dvllive.get_videos()
+    # dvllive.play_video('embed/1f08c1507c3e013157697054d2ab7c84')
+    for video in dvllive.videos_found:
+        dvllive.play_video(video['link'])
+    # dvllive.play_video(dvllive.videos_found[0]['link'])
 
 
 if __name__ == '__main__':
