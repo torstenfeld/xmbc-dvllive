@@ -24,6 +24,8 @@ class Dvllive(object):
             sub_page_html = urllib2.urlopen(self._page_videos + '?page=' + str(page_number))
             sub_page_soup = BeautifulSoup(sub_page_html.read())
             videos += self._get_video_per_page(sub_page_soup)
+            if str(page_number) >= '3':
+                break
         pp.pprint(videos)
 
     @staticmethod
