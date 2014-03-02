@@ -6,6 +6,7 @@
         version="0.0.1">
     <requires>
         <import addon="xbmc.python" version="2.1.0" />
+        <import addon="script.module.xbmcswift2" version="1.1.1" />
         <import addon="script.common.plugin.cache" version="1.5.1" />
         <import addon="script.module.parsedom" version="1.5.1" />
         <import addon="script.module.simple.downloader" version="0.9.4" />
@@ -16,7 +17,7 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en">DVL Live TV</summary>
-        <description lang="en">Shows streams of dvl-live.tv</description>
+        <description lang="en">Shows streams of dvllive.tv</description>
         <language>en</language>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>

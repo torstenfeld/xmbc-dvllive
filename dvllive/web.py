@@ -60,10 +60,12 @@ class Dvllive(object):
             result = {
                 'label': 'asdf',
                 # 'type': 'video',
-                'path': asset.encode('utf-8')
+                'path': asset
+                # 'path': asset.encode('utf-8')
                 # 'is_playable': True
             }
         finally:
+            print result
             return result
         # asset = embed_soup.find('a', class_='asset')
         # except NoneT
@@ -89,7 +91,6 @@ class Dvllive(object):
                     'path': link['href'],
                     # 'thumb': link.find('img')['src'],
                     'label': link['title'],
-                    # 'title': link['title'].encode('utf-8'),
                     # 'date': link.find('span', class_='date').string.encode('utf-8'),
                     'is_playable': True
                 }

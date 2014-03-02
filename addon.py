@@ -8,13 +8,12 @@
 # import xbmcplugin
 # import xbmcaddon
 # import xbmcgui
-from xbmcswift2 import *
+from xbmcswift2 import Plugin, xbmcaddon
 from dvllive.web import Dvllive
 # from pyxbmct.addonwindow import *
 
 
 addon = xbmcaddon.Addon('plugin.video.dvllive')
-__author__ = 'Torsten'
 
 plugin = Plugin()
 dvllive = Dvllive()
@@ -23,52 +22,27 @@ dvllive = Dvllive()
 def index():
     items = []
     dvllive.get_videos()
-    # item = {
-    #     'label': 'Hello XBMC!',
-    #     'path': 'http://s3.amazonaws.com/KA-youtube-converted/JwO_25S_eWE.mp4/JwO_25S_eWE.mp4',
-    #     'is_playable': True,
-    #     'type': 'video'
-    # }
-    # return [item, item]
     for video in dvllive.videos_found:
         item = {
-            # 'label': video['label'],
-            'label': video['path'],
+            'label': video['label'],
             'path': plugin.url_for('show_video', stub=video['path'])
-            # 'path': video['path'],
-            # 'is_playable': video['is_playable']
         }
         items.append(item)
     return items
-    # print dvllive.videos_found
-    # return dvllive.videos_found
 
 @plugin.route('/showvideo/<stub>/')
 def show_video(stub):
+    # name = urllib.unquote(safename)
     video = dvllive.play_video(stub)
-    item = {
-        'label': 'asdf',
-        'path': plugin.url_for('play_video', url=video['path'])
-    }
-    print item
-    items = [item]
-    return items
-    # return plugin.finish(items)
-
-@plugin.route('/playvideo/<url>/')
-def play_video(url):
-    print 'Playing url: %s' % url
-    # url = 'plugin://plugin.video.youtube/?action=play_video&videoid=%s' % lecture.youtube_id
-    plugin.log.info('Playing url: %s' % url)
-    # plugin.set_resolved_url(url)
+    # plugin.log.info('Playing url: %s' % 'asdf')
+    plugin.log.info('Playing url: %s' % video['path'])
     items = [{
-        'label': 'asdf',
-        'path': url,
+        # 'label': name,
+        'label': 'name',
+        'path': video['path'],
         'is_playable': True,
     }]
     return plugin.finish(items)
-
-    # return plugin.finish(url)
 
 
 # class MyDisplay(AddonFullWindow):
