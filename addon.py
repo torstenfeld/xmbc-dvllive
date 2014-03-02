@@ -24,8 +24,9 @@ def index():
     dvllive.get_videos()
     for video in dvllive.videos_found:
         item = {
-            'label': video['label'],
-            'path': plugin.url_for('show_video', stub=video['path'])
+            'label': video['title'],
+            'label2': 'test',
+            'path': plugin.url_for('show_video', stub=video['link'])
         }
         items.append(item)
     return items
@@ -33,16 +34,24 @@ def index():
 @plugin.route('/showvideo/<stub>/')
 def show_video(stub):
     # name = urllib.unquote(safename)
-    video = dvllive.play_video(stub)
+    asset = dvllive.play_video(stub)
     # plugin.log.info('Playing url: %s' % 'asdf')
-    plugin.log.info('Playing url: %s' % video['path'])
+    plugin.log.info('Playing url: %s' % asset)
     items = [{
         # 'label': name,
         'label': 'name',
-        'path': video['path'],
+        'path': asset,
         'is_playable': True,
     }]
     return plugin.finish(items)
+
+@plugin.route('/showrtmp/<url>/')
+def show_rtmp(url):
+    item = {
+        'label': 'rtmp',
+        'path': 'rtmp://fms.12E5.edgecastcdn.net/0012E5/mp4:videos/8Juv1MVa-485.mp4'
+    }
+    return plugin.play_video(item)
 
 
 # class MyDisplay(AddonFullWindow):

@@ -47,30 +47,15 @@ class Dvllive(object):
         except KeyError:
             print 'href not found'
             # print embed_soup
-            img = embed_soup.find('img')['data-src']
-            print img
-            result = {
-                'label': 'asdf',
-                # 'type': 'image',
-                'path': img
-                # 'is_playable': True
-            }
+            asset = embed_soup.find('img')['data-src']
+            print asset
         else:
             print asset
-            result = {
-                'label': 'asdf',
-                # 'type': 'video',
-                'path': asset
-                # 'path': asset.encode('utf-8')
-                # 'is_playable': True
-            }
         finally:
-            print result
-            return result
+            return asset
         # asset = embed_soup.find('a', class_='asset')
         # except NoneT
         # print page_soup.body.div.div.div.a['href']
-
 
     @staticmethod
     def _get_last_video_page(soup):
@@ -88,11 +73,10 @@ class Dvllive(object):
                 continue
             else:
                 single_vid = {
-                    'path': link['href'],
-                    # 'thumb': link.find('img')['src'],
-                    'label': link['title'],
-                    # 'date': link.find('span', class_='date').string.encode('utf-8'),
-                    'is_playable': True
+                    'link': link['href'],
+                    'thumb': link.find('img')['src'],
+                    'title': link['title'],
+                    'date': link.find('span', class_='date').string.encode('utf-8')
                 }
                 vids_on_this_page.append(single_vid)
         return vids_on_this_page
