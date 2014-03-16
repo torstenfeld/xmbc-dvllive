@@ -6,8 +6,83 @@ import string
 from xbmcswift2 import Plugin, xbmc, xbmcaddon
 from dvllive.web import Dvllive
 from mymixpanel import Mixpanel
+from pyxbmct.addonwindow import *
 
 is_mixpanel_available = 'no'
+
+class MyWindow(AddonDialogWindow):
+    def __init__(self, title='test', asset=None):
+        # You need to call base class' constructor.
+        super(MyWindow, self).__init__(title)
+        # Set the window width, height and the grid resolution: 2 rows, 3 columns.
+        self.setGeometry(350, 150, 2, 3)
+        # Create a text label.
+        label = Label('This is a PyXBMCt window.', alignment=ALIGN_CENTER)
+        # Place the label on the window grid.
+        self.placeControl(label, 0, 0, columnspan=3)
+        # Create a button.
+        button = Button('Close')
+        # Place the button on the window grid.
+        self.placeControl(button, 1, 1)
+        # Set initial focus on the button.
+        self.setFocus(button)
+        # Connect the button to a function.
+        listitem = xbmcgui.ListItem('Ironman')
+        listitem.setInfo('video', {'Title': 'Ironman', 'Genre': 'Science Fiction'})
+        player = xbmc.Player(xbmc.PLAYER_CORE_MPLAYER)
+        # self.connect(button, player.play(asset['path'], listitem))
+        self.connect(button, xbmc.PlayMedia(asset['path']))
+        # self.connect(button, plugin.set_resolved_url(asset))
+        # self.connect(button, self.close)
+        # Connect a key action to a function.
+        self.connect(ACTION_NAV_BACK, self.close)
+
+# Create a class for our UI
+class MyAddon(AddonDialogWindow):
+    def __init__(self, title=''):
+        """Class constructor"""
+        # Call the base class' constructor.
+        super(MyAddon, self).__init__(title)
+        # Set width, height and the grid parameters
+        self.setGeometry(300, 230, 4, 2)
+        # Call set controls method
+        self.set_controls()
+        # Call set navigation method.
+        self.set_navigation()
+        # Connect Backspace button to close our addon.
+        self.connect(ACTION_NAV_BACK, self.close)
+
+    def set_controls(self):
+        """Set up UI controls"""
+        # Image control
+        image = Image('xbmc-logo.png')
+        self.placeControl(image, 0, 0, rowspan=2, columnspan=2)
+        # Text label
+        label = Label('Your name:')
+        self.placeControl(label, 2, 0)
+        # Text edit control
+        self.name_field = Edit('')
+        self.placeControl(self.name_field, 2, 1)
+        # Close button
+        self.close_button = Button('Close')
+        self.placeControl(self.close_button, 3, 0)
+        # Connect close button
+        self.connect(self.close_button, self.close)
+        # Hello button.
+        self.hello_buton = Button('Hello')
+        self.placeControl(self.hello_buton, 3, 1)
+        # Connect Hello button.
+        self.connect(self.hello_buton, lambda:
+        xbmc.executebuiltin('Notification(Hello %s!, Welcome to PyXBMCt.)' %
+                            self.name_field.getText()))
+
+    def set_navigation(self):
+        """Set up keyboard/remote navigation between controls."""
+        self.name_field.controlUp(self.hello_buton)
+        self.name_field.controlDown(self.hello_buton)
+        self.close_button.controlLeft(self.hello_buton)
+        self.close_button.controlRight(self.hello_buton)
+
 
 class MyMixpanel(object):
     _mptoken = 'fed95492dc111b7805684b04ec2d0ce6'
@@ -99,13 +174,13 @@ def index():
         item = {
             'label': video['title'],
             'label2': 'test',
-            'path': plugin.url_for('show_video', stub=video['link'])
+            'path': plugin.url_for('show_info', stub=video['link'])
         }
         items.append(item)
     return items
 
 @plugin.route('/showvideo/<stub>/')
-def show_video(stub):
+def show_info(stub):
     mp.track('route', properties={
         'route': 'show_video',
         'stub': stub
@@ -113,26 +188,50 @@ def show_video(stub):
     # name = urllib.unquote(safename)
     asset = dvllive.play_video(stub)
     # plugin.log.info('Playing url: %s' % 'asdf')
-    plugin.log.info('Playing url: %s' % asset)
+    # plugin.log.info('Playing url: %s' % asset)
     items = [{
         # 'label': name,
-        'label': 'name',
-        'path': asset,
-        'is_playable': True,
+        'label': 'Start video',
+        'path': plugin.url_for('play_video', asset=asset),
+        'is_playable': False,
+        # 'is_playable': True,
     }]
-    return plugin.finish(items)
+    return items
+    # return plugin.finish(items)
 
 @plugin.route('/showrtmp/<url>/')
 def show_rtmp(url):
-    mp.track('route', properties={
-        'route': 'show_rtmp',
-        'stub': url
+    mp.track('action', properties={
+        'action': 'show_rtmp',
+        'streamurl': url
     })
     item = {
         'label': 'rtmp',
         'path': 'rtmp://fms.12E5.edgecastcdn.net/0012E5/mp4:videos/8Juv1MVa-485.mp4'
     }
     return plugin.play_video(item)
+
+@plugin.route('/playvideo/<asset>')
+def play_video(asset):
+    # Create a window instance.
+    # window = MyAddon('Hello, World!')
+    window = MyWindow('Hello, World!', asset={
+        'label': 'Start video',
+        'path': asset,
+        'is_playable': False,
+    })
+    # window = MyWindow('Hello, World!', asset=asset)
+    # Show the created window.
+    window.doModal()
+    # mp.track('action', properties={
+    #     'action': 'play_video',
+    #     'videolink': asset
+    # })
+    # for i in range(1, 10):
+    #     print 'playing video: %s' % (asset,)
+    # plugin.log.info('Playing url: %s' % asset)
+    # plugin.set_resolved_url(asset)
+    return None
 
 
 if __name__ == '__main__':
