@@ -10,10 +10,10 @@ from pyxbmct.addonwindow import *
 
 is_mixpanel_available = 'no'
 
-class MyWindow(AddonDialogWindow):
+class WindowVideoDetails(AddonDialogWindow):
     def __init__(self, title='test', asset=None):
         # You need to call base class' constructor.
-        super(MyWindow, self).__init__(title)
+        super(WindowVideoDetails, self).__init__(title)
         # Set the window width, height and the grid resolution: 2 rows, 3 columns.
         self.setGeometry(350, 150, 2, 3)
         # Create a text label.
@@ -30,12 +30,17 @@ class MyWindow(AddonDialogWindow):
         listitem = xbmcgui.ListItem('Ironman')
         listitem.setInfo('video', {'Title': 'Ironman', 'Genre': 'Science Fiction'})
         player = xbmc.Player(xbmc.PLAYER_CORE_MPLAYER)
-        # self.connect(button, player.play(asset['path'], listitem))
-        self.connect(button, xbmc.PlayMedia(asset['path']))
-        # self.connect(button, plugin.set_resolved_url(asset))
-        # self.connect(button, self.close)
+        self.connect(button, lambda: self._play_video(asset['path']))
         # Connect a key action to a function.
         self.connect(ACTION_NAV_BACK, self.close)
+
+    def _play_video(self, url):
+        mp.track('action', properties={
+            'action': 'play_video',
+            'videolink': url
+        })
+        xbmc.executebuiltin('xbmc.PlayMedia(%s)' % url)
+        self.close()
 
 # Create a class for our UI
 class MyAddon(AddonDialogWindow):
@@ -215,12 +220,12 @@ def show_rtmp(url):
 def play_video(asset):
     # Create a window instance.
     # window = MyAddon('Hello, World!')
-    window = MyWindow('Hello, World!', asset={
+    window = WindowVideoDetails('Hello, World!', asset={
         'label': 'Start video',
         'path': asset,
         'is_playable': False,
     })
-    # window = MyWindow('Hello, World!', asset=asset)
+    # window = WindowVideoDetails('Hello, World!', asset=asset)
     # Show the created window.
     window.doModal()
     # mp.track('action', properties={
