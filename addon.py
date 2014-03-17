@@ -11,13 +11,14 @@ from pyxbmct.addonwindow import *
 is_mixpanel_available = 'no'
 
 class WindowVideoDetails(AddonDialogWindow):
-    def __init__(self, title='test', asset=None):
+    def __init__(self, title='test', url=None):
         # You need to call base class' constructor.
         super(WindowVideoDetails, self).__init__(title)
         # Set the window width, height and the grid resolution: 2 rows, 3 columns.
-        self.setGeometry(350, 150, 2, 3)
+        # self.setGeometry(350, 150, 2, 3)
+        self.setGeometry(850, 550, 2, 3)
         # Create a text label.
-        label = Label('This is a PyXBMCt window.', alignment=ALIGN_CENTER)
+        label = Label('Video Details', alignment=ALIGN_CENTER)
         # Place the label on the window grid.
         self.placeControl(label, 0, 0, columnspan=3)
         # Create a button.
@@ -29,17 +30,17 @@ class WindowVideoDetails(AddonDialogWindow):
         # Connect the button to a function.
         listitem = xbmcgui.ListItem('Ironman')
         listitem.setInfo('video', {'Title': 'Ironman', 'Genre': 'Science Fiction'})
-        player = xbmc.Player(xbmc.PLAYER_CORE_MPLAYER)
-        self.connect(button, lambda: self._play_video(asset['path']))
+        self.connect(button, lambda: self._play_video(url, listitem))
         # Connect a key action to a function.
         self.connect(ACTION_NAV_BACK, self.close)
 
-    def _play_video(self, url):
+    def _play_video(self, url, listitem=None):
         mp.track('action', properties={
             'action': 'play_video',
             'videolink': url
         })
-        xbmc.executebuiltin('xbmc.PlayMedia(%s)' % url)
+        player = xbmc.Player(xbmc.PLAYER_CORE_MPLAYER)
+        player.play(url, listitem)
         self.close()
 
 # Create a class for our UI
@@ -191,13 +192,15 @@ def show_info(stub):
         'stub': stub
     })
     # name = urllib.unquote(safename)
-    asset = dvllive.play_video(stub)
+    url = dvllive.play_video(stub)
+    # print asset
     # plugin.log.info('Playing url: %s' % 'asdf')
     # plugin.log.info('Playing url: %s' % asset)
     items = [{
         # 'label': name,
         'label': 'Start video',
-        'path': plugin.url_for('play_video', asset=asset),
+        'path': plugin.url_for('play_video', url=url),
+        # 'path': plugin.url_for('play_video', asset=asset),
         'is_playable': False,
         # 'is_playable': True,
     }]
@@ -216,27 +219,12 @@ def show_rtmp(url):
     }
     return plugin.play_video(item)
 
-@plugin.route('/playvideo/<asset>')
-def play_video(asset):
+@plugin.route('/playvideo/<url>')
+def play_video(url):
     # Create a window instance.
-    # window = MyAddon('Hello, World!')
-    window = WindowVideoDetails('Hello, World!', asset={
-        'label': 'Start video',
-        'path': asset,
-        'is_playable': False,
-    })
-    # window = WindowVideoDetails('Hello, World!', asset=asset)
+    window = WindowVideoDetails('Hello, World!', url=url)
     # Show the created window.
     window.doModal()
-    # mp.track('action', properties={
-    #     'action': 'play_video',
-    #     'videolink': asset
-    # })
-    # for i in range(1, 10):
-    #     print 'playing video: %s' % (asset,)
-    # plugin.log.info('Playing url: %s' % asset)
-    # plugin.set_resolved_url(asset)
-    return None
 
 
 if __name__ == '__main__':
